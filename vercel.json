@@ -5,6 +5,10 @@
             "handle": "filesystem"
         },
         {
+            "src": "/api/generate-image",
+            "dest": "/api/generate-image.js"
+        },
+        {
             "src": "/.*",
             "dest": "/index.html"
         }
