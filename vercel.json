@@ -2,10 +2,6 @@
     "version": 2,
     "builds": [
         {
-            "src": "api/generate-image.js",
-            "use": "@vercel/node"
-        },
-        {
             "src": "*.html",
             "use": "@vercel/static"
         },
@@ -22,25 +18,13 @@
             "use": "@vercel/static"
         }
     ],
-    "rewrites": [
+    "routes": [
         {
-            "source": "/api/generate-image",
-            "destination": "/api/generate-image.js"
+            "handle": "filesystem"
         },
         {
-            "source": "/(.*)",
-            "destination": "/$1"
-        }
-    ],
-    "headers": [
-        {
-            "source": "/(.*)",
-            "headers": [
-                {
-                    "key": "Access-Control-Allow-Origin",
-                    "value": "*"
-                }
-            ]
+            "src": "/.*",
+            "dest": "/index.html"
         }
     ]
 }
