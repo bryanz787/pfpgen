@@ -1,0 +1,9 @@
+{
+    "name": "profile-picture-generator",
+    "version": "1.0.0",
+    "description": "Profile Picture Generator",
+    "scripts": {
+        "start": "vercel dev",
+        "deploy": "vercel --prod"
+    }
+}

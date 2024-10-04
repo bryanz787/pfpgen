@@ -1,0 +1,65 @@
+#canvas-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    border: 1px solid #000;
+    overflow: hidden;
+}
+
+#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#hat-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: move;
+    transform-origin: center center;
+}
+
+.hat-border {
+    border: 2px solid #007bff;
+}
+
+#hat {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.resize-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #007bff;
+    border: 1px solid #fff;
+    border-radius: 50%;
+}
+
+#resize-nw { top: -5px; left: -5px; cursor: nw-resize; }
+#resize-ne { top: -5px; right: -5px; cursor: ne-resize; }
+#resize-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
+#resize-se { bottom: -5px; right: -5px; cursor: se-resize; }
+
+#rotate-handle {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    background-color: #007bff;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    cursor: grab;
+}
+
+#flipBtn, #exportBtn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
