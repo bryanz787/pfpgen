@@ -7,18 +7,11 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Profile Picture Generator</h1>
-    <input type="file" id="imageInput" accept="image/*">
-    <div id="canvas-container">
-        <canvas id="canvas" width="400" height="400"></canvas>
-        <div id="hat-container" class="hat-border">
-            <img src="/src/IMG_1621.png" alt="Hat" id="hat-image" draggable="true" crossorigin="anonymous">
-        </div>
+    <div id="profile-picture">
+        <img src="/src/profile.jpg" alt="Profile" id="profile-image">
+        <img src="/src/IMG_1621.png" alt="Hat" id="hat-image">
     </div>
-    <button id="flipBtn">Flip Hat</button>
     <button id="export-button">Export as PNG</button>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

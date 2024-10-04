@@ -158,6 +158,81 @@ exportBtn.addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+    const hat = document.getElementById('hat-image');
+    let isDragging = false;
+    let startX, startY;
+    let originalX, originalY;
+
+    // Make the hat draggable
+    hat.addEventListener('mousedown', startDragging);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDragging);
+
+    function startDragging(e) {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        originalX = hat.offsetLeft;
+        originalY = hat.offsetTop;
+    }
+
+    function drag(e) {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        hat.style.left = originalX + dx + 'px';
+        hat.style.top = originalY + dy + 'px';
+    }
+
+    function stopDragging() {
+        isDragging = false;
+    }
+
+    // Make the hat resizable
+    const resizer = document.createElement('div');
+    resizer.className = 'resizer';
+    hat.parentElement.appendChild(resizer);
+
+    let isResizing = false;
+    let originalWidth, originalHeight;
+
+    resizer.addEventListener('mousedown', startResizing);
+    document.addEventListener('mousemove', resize);
+    document.addEventListener('mouseup', stopResizing);
+
+    function startResizing(e) {
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        originalWidth = hat.offsetWidth;
+        originalHeight = hat.offsetHeight;
+        e.preventDefault();
+    }
+
+    function resize(e) {
+        if (!isResizing) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        hat.style.width = originalWidth + dx + 'px';
+        hat.style.height = originalHeight + dy + 'px';
+    }
+
+    function stopResizing() {
+        isResizing = false;
+    }
+
+    // Make the hat rotatable
+    let rotation = 0;
+    document.addEventListener('keydown', rotate);
+
+    function rotate(e) {
+        if (e.key === 'r' || e.key === 'R') {
+            rotation += 15;
+            hat.style.transform = `rotate(${rotation}deg)`;
+        }
+    }
+
+    // Export functionality
     async function exportAsPNG() {
         const element = document.getElementById('profile-picture');
         if (typeof html2canvas === 'undefined') {
@@ -184,7 +259,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 hatX: hatRect.left - elementRect.left,
                 hatY: hatRect.top - elementRect.top,
                 hatWidth: hatRect.width,
-                hatHeight: hatRect.height
+                hatHeight: hatRect.height,
+                hatRotation: rotation
             };
 
             const response = await fetch('/api/generate-image', {
@@ -214,4 +290,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById('export-button').addEventListener('click', exportAsPNG);
+
+    // Load html2canvas
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    script.onload = () => console.log('html2canvas loaded');
+    script.onerror = () => console.error('Failed to load html2canvas');
+    document.head.appendChild(script);
 });
