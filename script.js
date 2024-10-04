@@ -156,3 +156,62 @@ exportBtn.addEventListener('click', () => {
         link.click();
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    async function exportAsPNG() {
+        const element = document.getElementById('profile-picture');
+        if (typeof html2canvas === 'undefined') {
+            console.error('html2canvas is not loaded');
+            return;
+        }
+        try {
+            const canvas = await html2canvas(element, { useCORS: true });
+            const imageDataUrl = canvas.toDataURL('image/png');
+
+            const hatImage = document.getElementById('hat-image');
+            const hatCanvas = document.createElement('canvas');
+            hatCanvas.width = hatImage.width;
+            hatCanvas.height = hatImage.height;
+            hatCanvas.getContext('2d').drawImage(hatImage, 0, 0);
+            const hatDataUrl = hatCanvas.toDataURL('image/png');
+
+            const hatRect = hatImage.getBoundingClientRect();
+            const elementRect = element.getBoundingClientRect();
+
+            const data = {
+                imageDataUrl,
+                hatDataUrl,
+                hatX: hatRect.left - elementRect.left,
+                hatY: hatRect.top - elementRect.top,
+                hatWidth: hatRect.width,
+                hatHeight: hatRect.height
+            };
+
+            const response = await fetch('/api/generate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'profile-picture.png';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } else {
+                console.error('Failed to generate image');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    document.getElementById('export-button').addEventListener('click', exportAsPNG);
+});

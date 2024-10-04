@@ -5,5 +5,8 @@
     "scripts": {
         "start": "vercel dev",
         "deploy": "vercel --prod"
+    },
+    "dependencies": {
+        "canvas": "^2.9.0"
     }
 }
