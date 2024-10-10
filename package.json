@@ -7,6 +7,6 @@
         "deploy": "vercel --prod"
     },
     "dependencies": {
-        "canvas": "^2.9.0"
+        "canvas": "^2.11.2"
     }
 }
