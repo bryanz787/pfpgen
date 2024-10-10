@@ -5,14 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Picture Generator</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://media.discordapp.net/attachments/1268652299803164825/1291791356330508404/IMG_1621.PNG?ex=670161f3&is=67001073&hm=b347702091d7af7727d3eb3e1ed00623bd36fa6e4ce11509a64da9c5c7bf4048&=&format=webp&quality=lossless"></script>
 </head>
 <body>
-    <div id="profile-picture">
-        <img src="/src/profile.jpg" alt="Profile" id="profile-image">
-        <img src="/src/IMG_1621.png" alt="Hat" id="hat-image">
+    <h1>Profile Picture Generator</h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <div id="canvas-container">
+        <canvas id="canvas" width="400" height="400"></canvas>
+        <div id="hat-container" class="hat-border">
+            <img id="hat" src="src/IMG_1621.png" alt="Hat" draggable="false" crossorigin="anonymous">
+            <div id="resize-nw" class="resize-handle"></div>
+            <div id="resize-ne" class="resize-handle"></div>
+            <div id="resize-sw" class="resize-handle"></div>
+            <div id="resize-se" class="resize-handle"></div>
+            <div id="rotate-handle"></div>
+        </div>
     </div>
-    <button id="export-button">Export as PNG</button>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <button id="flipBtn">Flip Hat</button>
+    <button id="exportBtn">Export PNG</button>
+
     <script src="script.js"></script>
 </body>
 </html>
