@@ -148,3 +148,8 @@ resetButton.addEventListener('click', () => {
     fileInput.value = '';
     uploadButton.classList.remove('hidden');
 });
+
+flipButton.addEventListener('click', () => {
+    flipped = !flipped;
+    hat.style.transform = `rotate(${currentHatAngle}rad) scaleX(${flipped ? -1 : 1})`;
+})
