@@ -3,6 +3,11 @@ const ctx = canvas.getContext('2d');
 const uploadButton = document.getElementById("upload-button");
 const fileInput = document.getElementById("file-input");
 const buttonContainer = document.getElementById("button-container");
+const hat = document.getElementById("hat-container");
+
+const flipButton = document.getElementById("flip-hat");
+const resetButton = document.getElementById("reset");
+const exportButton = document.getElementById("export");
 
 let img = null;
 let imgX = 0, imgY = 0;
@@ -10,20 +15,28 @@ let isDragging = false;
 let startX = 0, startY = 0;
 let scaledWidth, scaledHeight;
 
+let isHatDragging = false;
+let isHatResizing = false;
+let isHatRotating = false;
+let startHatX, startHatY, startHatWidth, startHatHeight, currentHatAngle = 0;
+let flipped = false;
+let activeHandle = null;
+
 canvas.height = canvas.width;
 buttonContainer.width = canvas.height;
+
+flipButton.height = flipButton.width;
 
 
 // Set initial canvas background color
 ctx.fillStyle = '#074000';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-// Upload button triggers file input
+/* logic to upload selected image as background on the canvas */
 uploadButton.addEventListener("click", () => {
     fileInput.click();
 });
 
-// Handle file input for image upload
 fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -32,8 +45,8 @@ fileInput.addEventListener('change', (e) => {
             img = new Image();
             img.onload = () => {
                 scaleAndCenterImage();
-                drawImage();
-                uploadButton.classList.toggle('hidden'); 
+                drawCanvas();
+                uploadButton.classList.add('hidden'); 
             };
             img.src = e.target.result;
         };
@@ -56,19 +69,25 @@ function scaleAndCenterImage() {
     imgY = (canvas.height - scaledHeight) / 2;
 }
 
-function drawImage() {
+function drawCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#074000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (img) {
         ctx.drawImage(img, imgX, imgY, scaledWidth, scaledHeight);
-    } else {
-        ctx.fillStyle = '#074000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        uploadButton.classList.toggle('hidden');
+
+        if (hat) {
+            hat.classList.remove('hidden');
+        }
+    }
+
+    if (!img) {
+        uploadButton.classList.remove('hidden');
     }
 }
+
+/* logic to resize and crop image */
 
 canvas.addEventListener('mousedown', (event) => {
     if (img) {
@@ -104,8 +123,28 @@ canvas.addEventListener('mousemove', (event) => {
 
 canvas.addEventListener('mouseup', () => {
     isDragging = false;
+    isDraggingHat = false;
 });
 
 canvas.addEventListener('mouseleave', () => {
     isDragging = false;
+    isDraggingHat = false;
+});
+
+
+
+
+
+/* logic to add functionality to the buttons */
+resetButton.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    img = null;
+    imgX = 0, imgY = 0;
+    isDragging = false;
+    startX = 0, startY = 0;
+    scaledWidth, scaledHeight;
+
+    fileInput.value = '';
+    uploadButton.classList.remove('hidden');
 });

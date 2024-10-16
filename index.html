@@ -12,18 +12,32 @@
 
         <div id="upload-gui">
             <div id="logo-header">
-                <img src="./assets/abstract.png">
+                <img src="./assets/abstract.svg">
             </div>
             <div id="canvas-container">
                 <canvas id="canvas"></canvas>
                 <button id="upload-button">Upload</button>
+                <div id="hat-container" class="hat-border hidden">
+                    <img id="hat" src="src/IMG_1621.png" alt="Hat" draggable="false" crossorigin="anonymous">
+                    <div id="resize-nw" class="resize-handle"></div>
+                    <div id="resize-ne" class="resize-handle"></div>
+                    <div id="resize-sw" class="resize-handle"></div>
+                    <div id="resize-se" class="resize-handle"></div>
+                    <div id="rotate-handle"></div>
+                </div>
                 <input type="file" id="file-input" style="display: none;" accept="image/*">
             </div>
 
             <div id="button-container">
-                <button id="flip-hat">Flip Hat</button>
-                <button id="reset">Reset</button>
-                <button id="export">Export</button>
+                <button id="flip-hat">
+                    <img src="./assets/flip.svg">
+                </button>
+                <button id="reset">
+                    <img src="./assets/refresh.svg">
+                </button>
+                <button id="export">
+                    JOIN
+                </button>
             </div>
         </div>
     </div>
