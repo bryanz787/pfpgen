@@ -1,5 +1,5 @@
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 const uploadButton = document.getElementById("upload-button");
 const fileInput = document.getElementById("file-input");
 const flipButton = document.getElementById("flip-hat");
@@ -7,26 +7,31 @@ const resetButton = document.getElementById("reset");
 const exportButton = document.getElementById("export");
 
 let img = null;
-let imgX = 0, imgY = 0;
+let imgX = 0,
+    imgY = 0;
 let isDragging = false;
-let startX = 0, startY = 0;
+let startX = 0,
+    startY = 0;
 let scaledWidth, scaledHeight;
 
 // Hat variables
 let hatImg = new Image();
-let hatX, hatY, hatWidth = 200, hatHeight;
+let hatX,
+    hatY,
+    hatWidth = 200,
+    hatHeight;
 let isHatDragging = false;
 let hatStartX, hatStartY;
 let flipped = false;
 
 // Set canvas size
 canvas.height = canvas.width;
-ctx.fillStyle = '#074000';
+ctx.fillStyle = "#074000";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-hatImg.src = 'src/IMG_1621.png';  // Path to hat image
+hatImg.src = "src/IMG_1621.png"; // Path to hat image
 hatImg.onload = () => {
-    hatHeight = hatImg.height * hatWidth / hatImg.width;
+    hatHeight = (hatImg.height * hatWidth) / hatImg.width;
     hatX = canvas.width / 2 - hatWidth / 2;
     hatY = canvas.height / 2 - hatHeight / 2;
 };
@@ -36,7 +41,7 @@ uploadButton.addEventListener("click", () => {
     fileInput.click();
 });
 
-fileInput.addEventListener('change', (e) => {
+fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
         const reader = new FileReader();
@@ -45,7 +50,7 @@ fileInput.addEventListener('change', (e) => {
             img.onload = () => {
                 scaleAndCenterImage();
                 drawCanvas();
-                uploadButton.classList.add('hidden');
+                uploadButton.classList.add("hidden");
             };
             img.src = e.target.result;
         };
@@ -70,61 +75,77 @@ function scaleAndCenterImage() {
 
 function drawCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#074000';
+    ctx.fillStyle = "#074000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (img) {
-        ctx.drawImage(img, imgX, imgY, scaledWidth, scaledHeight);  
+        ctx.drawImage(img, imgX, imgY, scaledWidth, scaledHeight);
 
         if (hatImg) {
-            ctx.drawImage(hatImg, hatX, hatY, hatWidth, hatHeight);
+            ctx.save();
+
+            if (flipped) {
+                ctx.translate(hatX + hatWidth, hatY);
+                ctx.scale(-1, 1);
+                ctx.drawImage(hatImg, 0, 0, hatWidth, hatHeight);
+                ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation
+            } else {
+                ctx.drawImage(hatImg, hatX, hatY, hatWidth, hatHeight);
+            }
+
+            // Debug rectangle
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(hatX, hatY, hatWidth, hatHeight);
+            
+            ctx.restore();
         }
     }
 }
 
 /* Dragging and resizing logic */
-canvas.addEventListener('mousedown', (event) => {
+canvas.addEventListener("mousedown", (event) => {
     if (isMouseOnHat(event.offsetX, event.offsetY)) {
         isHatDragging = true;
         isDragging = false;
+
         hatStartX = event.offsetX - hatX;
         hatStartY = event.offsetY - hatY;
     } else if (img) {
         isDragging = true;
         isHatDragging = false;
+        
         startX = event.offsetX - imgX;
         startY = event.offsetY - imgY;
     }
 });
 
 function isMouseOnHat(mouseX, mouseY) {
-    console.log(mouseX, mouseY, hatX, hatY);
-    return mouseX >= hatX && mouseX <= hatX + hatWidth &&
-        mouseY >= hatY && mouseY <= hatY + hatHeight;
+    // Adjust mouse coordinates for potential canvas scaling
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    mouseX *= scaleX;
+    mouseY *= scaleY;
+
+    return (
+        mouseX >= hatX &&
+        mouseX <= hatX + hatWidth &&
+        mouseY >= hatY &&
+        mouseY <= hatY + hatHeight
+    );  
 }
 
-canvas.addEventListener('mousemove', (event) => {
-    if (isMouseOnHat(event.offsetX, event.offsetY)) {
-        canvas.style.cursor = 'move';  
-    } else {
-        canvas.style.cursor = 'default';  
-    }
+canvas.addEventListener("mousemove", (event) => {
+    canvas.style.cursor = isMouseOnHat(event.offsetX, event.offsetY) ? "move" : "default";
 
     if (isDragging) {
         let newImgX = event.offsetX - startX;
         let newImgY = event.offsetY - startY;
 
-        if (newImgX > 0) {
-            newImgX = 0;
-        } else if (newImgX + scaledWidth < canvas.width) {
-            newImgX = canvas.width - scaledWidth;
-        }
-
-        if (newImgY > 0) {
-            newImgY = 0;
-        } else if (newImgY + scaledHeight < canvas.height) {
-            newImgY = canvas.height - scaledHeight;
-        }
+        newImgX = Math.max(Math.min(newImgX, 0), canvas.width - scaledWidth);
+        newImgY = Math.max(Math.min(newImgY, 0), canvas.height - scaledHeight);
 
         imgX = newImgX;
         imgY = newImgY;
@@ -136,19 +157,8 @@ canvas.addEventListener('mousemove', (event) => {
         let newHatX = event.offsetX - hatStartX;
         let newHatY = event.offsetY - hatStartY;
 
-        /*
-        if (newHatX > 0) {
-            newHatX = 0;
-        } else if (newHatX + hatWidth < canvas.width) {
-            newHatX = canvas.width - hatWidth;
-        }
-
-        if (newHatY > 0) {
-            newHatY = 0;
-        } else if (newHatY + hatHeight < canvas.height) {
-            newHatY = canvas.height - hatHeight;
-        }
-        */
+        newHatX = Math.max(0, Math.min(newHatX, canvas.width - hatWidth));
+        newHatY = Math.max(0, Math.min(newHatY, canvas.height - hatHeight));
 
         hatX = newHatX;
         hatY = newHatY;
@@ -156,41 +166,41 @@ canvas.addEventListener('mousemove', (event) => {
     }
 });
 
-canvas.addEventListener('mouseup', () => {
+canvas.addEventListener("mouseup", () => {
     isDragging = false;
     isHatDragging = false;
 });
 
-canvas.addEventListener('mouseleave', () => {
+canvas.addEventListener("mouseleave", () => {
     isDragging = false;
     isHatDragging = false;
 });
 
 /* Flip the hat */
-flipButton.addEventListener('click', () => {
+flipButton.addEventListener("click", () => {
     flipped = !flipped;
     drawCanvas();
 });
 
 /* Reset canvas */
-resetButton.addEventListener('click', () => {
+resetButton.addEventListener("click", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     img = null;
-    uploadButton.classList.remove('hidden');
+    uploadButton.classList.remove("hidden");
     drawCanvas();
 });
 
-/* export button */ 
+/* export button */
 exportButton.addEventListener("click", () => {
     if (img !== null) {
-        const dataURL = canvas.toDataURL('image/png');
+        const dataURL = canvas.toDataURL("image/png");
 
-        const link = document.createElement('a');
-        link.classList.add('hidden');
+        const link = document.createElement("a");
+        link.classList.add("hidden");
         link.href = dataURL;
 
-        link.download = 'profile-picture.png';
+        link.download = "profile-picture.png";
 
         link.click();
     }
-})
+});
