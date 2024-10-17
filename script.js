@@ -2,12 +2,8 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const uploadButton = document.getElementById("upload-button");
 const fileInput = document.getElementById("file-input");
-const buttonContainer = document.getElementById("button-container");
-const hat = document.getElementById("hat-container");
-
 const flipButton = document.getElementById("flip-hat");
 const resetButton = document.getElementById("reset");
-const exportButton = document.getElementById("export");
 
 let img = null;
 let imgX = 0, imgY = 0;
@@ -15,24 +11,27 @@ let isDragging = false;
 let startX = 0, startY = 0;
 let scaledWidth, scaledHeight;
 
+// Hat variables
+let hatImg = new Image();
+let hatX, hatY, hatWidth = 200, hatHeight;
 let isHatDragging = false;
-let isHatResizing = false;
-let isHatRotating = false;
-let startHatX, startHatY, startHatWidth, startHatHeight, currentHatAngle = 0;
+let hatStartX, hatStartY;
 let flipped = false;
-let activeHandle = null;
 
+// Set canvas size
 canvas.height = canvas.width;
-buttonContainer.width = canvas.height;
-
-flipButton.height = flipButton.width;
-
-
-// Set initial canvas background color
 ctx.fillStyle = '#074000';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-/* logic to upload selected image as background on the canvas */
+hatImg.src = 'src/IMG_1621.png';  // Path to hat image
+hatImg.onload = () => {
+    hatHeight = hatImg.height * hatWidth / hatImg.width;
+    hatX = canvas.width / 2 - hatWidth / 2;
+    hatY = canvas.height / 2 - hatHeight / 2;
+    console.log(hatX, hatY, hatHeight, hatWidth);
+};
+
+/* Upload image logic */
 uploadButton.addEventListener("click", () => {
     fileInput.click();
 });
@@ -46,7 +45,7 @@ fileInput.addEventListener('change', (e) => {
             img.onload = () => {
                 scaleAndCenterImage();
                 drawCanvas();
-                uploadButton.classList.add('hidden'); 
+                uploadButton.classList.add('hidden');
             };
             img.src = e.target.result;
         };
@@ -57,12 +56,12 @@ fileInput.addEventListener('change', (e) => {
 function scaleAndCenterImage() {
     const aspectRatio = img.width / img.height;
 
-    if (aspectRatio > 1) { 
+    if (aspectRatio > 1) {
         scaledWidth = canvas.width * aspectRatio;
         scaledHeight = canvas.height;
     } else {
-        scaledHeight = canvas.height * aspectRatio;
         scaledWidth = canvas.width;
+        scaledHeight = canvas.height / aspectRatio;
     }
 
     imgX = (canvas.width - scaledWidth) / 2;
@@ -75,29 +74,50 @@ function drawCanvas() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (img) {
-        ctx.drawImage(img, imgX, imgY, scaledWidth, scaledHeight);
+        ctx.drawImage(img, imgX, imgY, scaledWidth, scaledHeight);  
 
-        if (hat) {
-            hat.classList.remove('hidden');
+        if (hatImg) {
+            ctx.save();
+            ctx.translate(hatX + hatWidth / 2, hatY + hatHeight / 2);  
+            ctx.scale(flipped ? -1 : 1, 1);  
+            ctx.drawImage(hatImg, -hatWidth / 2, -hatHeight / 2, hatWidth, hatHeight);  
+            ctx.restore();
+
+            ctx.strokeStyle = 'red'; 
+            ctx.lineWidth = 2; 
+            ctx.strokeRect(hatX, hatY, hatWidth, hatHeight);
         }
-    }
-
-    if (!img) {
-        uploadButton.classList.remove('hidden');
     }
 }
 
-/* logic to resize and crop image */
-
+/* Dragging and resizing logic */
 canvas.addEventListener('mousedown', (event) => {
-    if (img) {
+    if (isMouseOnHat(event.offsetX, event.offsetY)) {
+        isHatDragging = true;
+        isDragging = false;
+        hatStartX = event.offsetX - hatX;
+        hatStartY = event.offsetY - hatY;
+    } else if (img) {
         isDragging = true;
+        isHatDragging = false;
         startX = event.offsetX - imgX;
         startY = event.offsetY - imgY;
     }
 });
 
+function isMouseOnHat(mouseX, mouseY) {
+    console.log(mouseX, mouseY, hatX, hatY);
+    return mouseX >= hatX && mouseX <= hatX + hatWidth &&
+        mouseY >= hatY && mouseY <= hatY + hatHeight;
+}
+
 canvas.addEventListener('mousemove', (event) => {
+    if (isMouseOnHat(event.offsetX, event.offsetY)) {
+        canvas.style.cursor = 'move';  
+    } else {
+        canvas.style.cursor = 'default';  
+    }
+
     if (isDragging) {
         let newImgX = event.offsetX - startX;
         let newImgY = event.offsetY - startY;
@@ -117,39 +137,51 @@ canvas.addEventListener('mousemove', (event) => {
         imgX = newImgX;
         imgY = newImgY;
 
-        drawImage();
+        drawCanvas();
+    }
+
+    if (isHatDragging) {
+        let newHatX = event.offsetX - hatStartX;
+        let newHatY = event.offsetY - hatStartY;
+
+        if (newHatX > 0) {
+            newHatX = 0;
+        } else if (newHatX + hatWidth < canvas.width) {
+            newHatX = canvas.width - hatWidth;
+        }
+
+        if (newHatY > 0) {
+            newHatY = 0;
+        } else if (newHatY + hatHeight < canvas.height) {
+            newHatY = canvas.height - hatHeight;
+        }
+
+        hatX = newHatX;
+        hatY = newHatY;
+        drawCanvas();
     }
 });
 
 canvas.addEventListener('mouseup', () => {
     isDragging = false;
-    isDraggingHat = false;
+    isHatDragging = false;
 });
 
 canvas.addEventListener('mouseleave', () => {
     isDragging = false;
-    isDraggingHat = false;
+    isHatDragging = false;
 });
 
-
-
-
-
-/* logic to add functionality to the buttons */
-resetButton.addEventListener('click', () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    img = null;
-    imgX = 0, imgY = 0;
-    isDragging = false;
-    startX = 0, startY = 0;
-    scaledWidth, scaledHeight;
-
-    fileInput.value = '';
-    uploadButton.classList.remove('hidden');
-});
-
+/* Flip the hat */
 flipButton.addEventListener('click', () => {
     flipped = !flipped;
-    hat.style.transform = `rotate(${currentHatAngle}rad) scaleX(${flipped ? -1 : 1})`;
-})
+    drawCanvas();
+});
+
+/* Reset canvas */
+resetButton.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    img = null;
+    uploadButton.classList.remove('hidden');
+    drawCanvas();
+});
