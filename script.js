@@ -160,51 +160,48 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Modify the export function
-    document.getElementById('exportBtn').addEventListener('click', function() {
-        const tempCanvas = document.createElement('canvas');
+    document.getElementById("exportBtn").addEventListener("click", function () {
+        const tempCanvas = document.createElement("canvas");
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
-        const tempCtx = tempCanvas.getContext('2d');
+        const tempCtx = tempCanvas.getContext("2d");
 
         // Draw the main canvas content
         tempCtx.drawImage(canvas, 0, 0);
 
-        // Draw the hat
-        const hatRect = hatContainer.getBoundingClientRect();
-        const canvasRect = canvas.getBoundingClientRect();
+        // Get the hat's actual rendered dimensions
+        const hatWidth = parseInt(hatContainer.style.width, 10);
+        const hatHeight = parseInt(hatContainer.style.height, 10);
 
-        // Calculate scaling factors
-        const scaleX = canvas.width / canvasRect.width;
-        const scaleY = canvas.height / canvasRect.height;
+        // Calculate hat position relative to canvas
+        const hatX = hatContainer.offsetLeft;
+        const hatY = hatContainer.offsetTop;
 
-        // Calculate hat position and size relative to canvas
-        const hatX = (hatRect.left - canvasRect.left) * scaleX;
-        const hatY = (hatRect.top - canvasRect.top) * scaleY;
-        const hatWidth = hatRect.width * scaleX;
-        const hatHeight = hatRect.height * scaleY;
+        // Calculate center position of the hat
+        const hatCenterX = hatX + hatWidth / 2;
+        const hatCenterY = hatY + hatHeight / 2;
 
         // Save context state
         tempCtx.save();
 
         // Translate to hat center
-        tempCtx.translate(hatX + hatWidth / 2, hatY + hatHeight / 2);
+        tempCtx.translate(hatCenterX, hatCenterY);
+        // Flip if necessary (before rotation)
+        tempCtx.scale(flipped ? -1 : 1, 1);
 
         // Rotate
         tempCtx.rotate(currentAngle);
 
-        // Flip if necessary
-        tempCtx.scale(flipped ? -1 : 1, 1);
-
-        // Draw hat
+        // Draw hat at the center with the correct offsets
         tempCtx.drawImage(hat, -hatWidth / 2, -hatHeight / 2, hatWidth, hatHeight);
 
         // Restore context state
         tempCtx.restore();
 
         // Create download link
-        const link = document.createElement('a');
-        link.download = 'profile-picture.png';
-        link.href = tempCanvas.toDataURL('image/png');
+        const link = document.createElement("a");
+        link.download = "profile-picture.png";
+        link.href = tempCanvas.toDataURL("image/png");
         link.click();
     });
 
