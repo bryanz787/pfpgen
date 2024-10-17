@@ -4,6 +4,7 @@ const uploadButton = document.getElementById("upload-button");
 const fileInput = document.getElementById("file-input");
 const flipButton = document.getElementById("flip-hat");
 const resetButton = document.getElementById("reset");
+const exportButton = document.getElementById("export");
 
 let img = null;
 let imgX = 0, imgY = 0;
@@ -28,7 +29,6 @@ hatImg.onload = () => {
     hatHeight = hatImg.height * hatWidth / hatImg.width;
     hatX = canvas.width / 2 - hatWidth / 2;
     hatY = canvas.height / 2 - hatHeight / 2;
-    console.log(hatX, hatY, hatHeight, hatWidth);
 };
 
 /* Upload image logic */
@@ -77,15 +77,7 @@ function drawCanvas() {
         ctx.drawImage(img, imgX, imgY, scaledWidth, scaledHeight);  
 
         if (hatImg) {
-            ctx.save();
-            ctx.translate(hatX + hatWidth / 2, hatY + hatHeight / 2);  
-            ctx.scale(flipped ? -1 : 1, 1);  
-            ctx.drawImage(hatImg, -hatWidth / 2, -hatHeight / 2, hatWidth, hatHeight);  
-            ctx.restore();
-
-            ctx.strokeStyle = 'red'; 
-            ctx.lineWidth = 2; 
-            ctx.strokeRect(hatX, hatY, hatWidth, hatHeight);
+            ctx.drawImage(hatImg, hatX, hatY, hatWidth, hatHeight);
         }
     }
 }
@@ -144,6 +136,7 @@ canvas.addEventListener('mousemove', (event) => {
         let newHatX = event.offsetX - hatStartX;
         let newHatY = event.offsetY - hatStartY;
 
+        /*
         if (newHatX > 0) {
             newHatX = 0;
         } else if (newHatX + hatWidth < canvas.width) {
@@ -155,6 +148,7 @@ canvas.addEventListener('mousemove', (event) => {
         } else if (newHatY + hatHeight < canvas.height) {
             newHatY = canvas.height - hatHeight;
         }
+        */
 
         hatX = newHatX;
         hatY = newHatY;
@@ -185,3 +179,18 @@ resetButton.addEventListener('click', () => {
     uploadButton.classList.remove('hidden');
     drawCanvas();
 });
+
+/* export button */ 
+exportButton.addEventListener("click", () => {
+    if (img !== null) {
+        const dataURL = canvas.toDataURL('image/png');
+
+        const link = document.createElement('a');
+        link.classList.add('hidden');
+        link.href = dataURL;
+
+        link.download = 'profile-picture.png';
+
+        link.click();
+    }
+})
