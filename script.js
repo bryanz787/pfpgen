@@ -1,253 +1,245 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const hatContainer = document.getElementById('hat-container');
-    const hat = document.getElementById('hat');
-    hat.onload = function() {
-        // Initialize hat position and size here
-        initializeHat();
-    };
-    let isDragging = false;
-    let isResizing = false;
-    let isRotating = false;
-    let startX, startY, startWidth, startHeight, startAngle = 0;
-    let currentAngle = 0;
-    let flipped = false;
-    let activeHandle = null;
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const uploadButton = document.getElementById("upload-button");
+const fileInput = document.getElementById("file-input");
+const flipButton = document.getElementById("flip-hat");
+const resetButton = document.getElementById("reset");
+const exportButton = document.getElementById("export");
 
-    // Initialize hat position and size
-    function initializeHat() {
-        const aspectRatio = hat.naturalWidth / hat.naturalHeight;
-        const initialWidth = 100;
-        const initialHeight = initialWidth / aspectRatio;
-        
-        hatContainer.style.width = initialWidth + 'px';
-        hatContainer.style.height = initialHeight + 'px';
-        hatContainer.style.left = '150px';
-        hatContainer.style.top = '150px';
-    }
+let img = null;
+let imgX = 0,
+    imgY = 0;
+let isDragging = false;
+let startX = 0,
+    startY = 0;
+let scaledWidth, scaledHeight;
 
-    initializeHat();
+// Hat variables
+let hatImg = new Image();
+let hatX,
+    hatY,
+    hatWidth = 200,
+    hatHeight;
+let isHatDragging = false;
+let hatStartX, hatStartY;
+let flipped = false;
+let hatScale = 1;
+let hatRotation = 0;
 
-    // Dragging
-    hatContainer.addEventListener('mousedown', startDragging);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', stopDragging);
+// Set canvas size
+canvas.height = canvas.width;
+ctx.fillStyle = "#074000";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    function startDragging(e) {
-        if (e.target.classList.contains('resize-handle') || e.target === document.getElementById('rotate-handle')) return;
-        isDragging = true;
-        startX = e.clientX - hatContainer.offsetLeft;
-        startY = e.clientY - hatContainer.offsetTop;
-    }
+hatImg.src = "src/IMG_1621.png"; // Path to hat image
+hatImg.onload = () => {
+    hatHeight = (hatImg.height * hatWidth) / hatImg.width;
+    hatX = canvas.width / 2 - hatWidth / 2;
+    hatY = canvas.height / 2 - hatHeight / 2;
+};
 
-    function drag(e) {
-        if (isDragging) {
-            hatContainer.style.left = (e.clientX - startX) + 'px';
-            hatContainer.style.top = (e.clientY - startY) + 'px';
-        }
-    }
-
-    function stopDragging() {
-        isDragging = false;
-        isResizing = false;
-    }
-
-    // Resizing
-    const resizeHandles = document.querySelectorAll('.resize-handle');
-    resizeHandles.forEach(handle => {
-        handle.addEventListener('mousedown', startResizing);
-    });
-
-    function startResizing(e) {
-        isResizing = true;
-        activeHandle = e.target;
-        startX = e.clientX;
-        startY = e.clientY;
-        startWidth = parseInt(document.defaultView.getComputedStyle(hatContainer).width, 10);
-        startHeight = parseInt(document.defaultView.getComputedStyle(hatContainer).height, 10);
-        startLeft = hatContainer.offsetLeft;
-        startTop = hatContainer.offsetTop;
-        document.addEventListener('mousemove', resize);
-        document.addEventListener('mouseup', stopResizing);
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    function resize(e) {
-        if (isResizing) {
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            const aspectRatio = startWidth / startHeight;
-            let newWidth, newHeight, newLeft, newTop;
-
-            switch (activeHandle.id) {
-                case 'resize-se':
-                    newWidth = startWidth + dx;
-                    newHeight = newWidth / aspectRatio;
-                    break;
-                case 'resize-sw':
-                    newWidth = startWidth - dx;
-                    newHeight = newWidth / aspectRatio;
-                    newLeft = startLeft + dx;
-                    break;
-                case 'resize-ne':
-                    newWidth = startWidth + dx;
-                    newHeight = newWidth / aspectRatio;
-                    newTop = startTop + startHeight - newHeight;
-                    break;
-                case 'resize-nw':
-                    newWidth = startWidth - dx;
-                    newHeight = newWidth / aspectRatio;
-                    newLeft = startLeft + dx;
-                    newTop = startTop + startHeight - newHeight;
-                    break;
-            }
-
-            // Apply new dimensions and position
-            hatContainer.style.width = `${newWidth}px`;
-            hatContainer.style.height = `${newHeight}px`;
-            if (newLeft !== undefined) hatContainer.style.left = `${newLeft}px`;
-            if (newTop !== undefined) hatContainer.style.top = `${newTop}px`;
-        }
-        e.preventDefault();
-    }
-
-    function stopResizing() {
-        isResizing = false;
-        activeHandle = null;
-        document.removeEventListener('mousemove', resize);
-        document.removeEventListener('mouseup', stopResizing);
-    }
-
-    // Rotating
-    const rotateHandle = document.getElementById('rotate-handle');
-    rotateHandle.addEventListener('mousedown', startRotating);
-
-    function startRotating(e) {
-        isRotating = true;
-        const rect = hatContainer.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) - currentAngle;
-        document.addEventListener('mousemove', rotate);
-        document.addEventListener('mouseup', stopRotating);
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    function rotate(e) {
-        if (isRotating) {
-            const rect = hatContainer.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-            currentAngle = angle - startAngle;
-            hatContainer.style.transform = `rotate(${currentAngle}rad) scaleX(${flipped ? -1 : 1})`;
-        }
-    }
-
-    function stopRotating() {
-        isRotating = false;
-        document.removeEventListener('mousemove', rotate);
-        document.removeEventListener('mouseup', stopRotating);
-    }
-
-    // Flipping
-    document.getElementById('flipBtn').addEventListener('click', function() {
-        flipped = !flipped;
-        hatContainer.style.transform = `rotate(${currentAngle}rad) scaleX(${flipped ? -1 : 1})`;
-    });
-
-    // Modify the export function
-    document.getElementById('exportBtn').addEventListener('click', function() {
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        const tempCtx = tempCanvas.getContext('2d');
-
-        // Draw the main canvas content
-        tempCtx.drawImage(canvas, 0, 0);
-
-        // Draw the hat
-        const hatRect = hatContainer.getBoundingClientRect();
-        const canvasRect = canvas.getBoundingClientRect();
-
-        // Calculate scaling factors
-        const scaleX = canvas.width / canvasRect.width;
-        const scaleY = canvas.height / canvasRect.height;
-
-        // Calculate hat position and size relative to canvas
-        const hatX = (hatRect.left - canvasRect.left) * scaleX;
-        const hatY = (hatRect.top - canvasRect.top) * scaleY;
-        const hatWidth = hatRect.width * scaleX;
-        const hatHeight = hatRect.height * scaleY;
-
-        // Save context state
-        tempCtx.save();
-
-        // Translate to hat center
-        tempCtx.translate(hatX + hatWidth / 2, hatY + hatHeight / 2);
-
-        // Rotate
-        tempCtx.rotate(currentAngle);
-
-        // Flip if necessary
-        tempCtx.scale(flipped ? -1 : 1, 1);
-
-        // Draw hat
-        tempCtx.drawImage(hat, -hatWidth / 2, -hatHeight / 2, hatWidth, hatHeight);
-
-        // Restore context state
-        tempCtx.restore();
-
-        // Create download link
-        const link = document.createElement('a');
-        link.download = 'profile-picture.png';
-        link.href = tempCanvas.toDataURL('image/png');
-        link.click();
-    });
-
-    // Load initial image
-    const imageInput = document.getElementById('imageInput');
-    imageInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const img = new Image();
-            img.onload = function() {
-                // Calculate the aspect ratio
-                const aspectRatio = img.width / img.height;
-                
-                // Set canvas size to maintain aspect ratio and image quality
-                if (aspectRatio > 1) {
-                    canvas.width = Math.min(img.width, 800);
-                    canvas.height = canvas.width / aspectRatio;
-                } else {
-                    canvas.height = Math.min(img.height, 800);
-                    canvas.width = canvas.height * aspectRatio;
-                }
-
-                // Adjust canvas-container size
-                const canvasContainer = document.getElementById('canvas-container');
-                canvasContainer.style.width = canvas.width + 'px';
-                canvasContainer.style.height = canvas.height + 'px';
-
-                // Draw image on canvas
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                // Reset hat position and size
-                initializeHat();
-            }
-            img.src = event.target.result;
-        }
-        reader.readAsDataURL(file);
-    });
-
-    // Prevent default selection behavior on the hat container
-    hatContainer.addEventListener('mousedown', function(e) {
-        if (!e.target.classList.contains('resize-handle')) {
-            e.preventDefault();
-        }
-    });
+/* Upload image logic */
+uploadButton.addEventListener("click", () => {
+    fileInput.click();
 });
+
+fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            img = new Image();
+            img.onload = () => {
+                scaleAndCenterImage();
+                drawCanvas();
+                uploadButton.classList.add("hidden");
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+function scaleAndCenterImage() {
+    const aspectRatio = img.width / img.height;
+
+    if (aspectRatio > 1) {
+        scaledWidth = canvas.width * aspectRatio;
+        scaledHeight = canvas.height;
+    } else {
+        scaledWidth = canvas.width;
+        scaledHeight = canvas.height / aspectRatio;
+    }
+
+    imgX = (canvas.width - scaledWidth) / 2;
+    imgY = (canvas.height - scaledHeight) / 2;
+}
+
+function drawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#074000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (img) {
+        ctx.drawImage(img, imgX, imgY, scaledWidth, scaledHeight);
+
+        if (hatImg) {
+            ctx.save();
+            ctx.translate(hatX + (hatWidth * hatScale) / 2, hatY + (hatHeight * hatScale) / 2);
+            ctx.rotate(hatRotation * Math.PI / 180);
+            
+            if (flipped) {
+                ctx.scale(-1, 1);
+            }
+            
+            ctx.drawImage(hatImg, -hatWidth * hatScale / 2, -hatHeight * hatScale / 2, hatWidth * hatScale, hatHeight * hatScale);
+            
+            ctx.restore();
+        }
+    }
+}
+
+/* Dragging and resizing logic */
+canvas.addEventListener("mousedown", (event) => {
+    if (isMouseOnHat(event.offsetX, event.offsetY)) {
+        isHatDragging = true;
+        isDragging = false;
+
+        hatStartX = event.offsetX - hatX;
+        hatStartY = event.offsetY - hatY;
+    } else if (img) {
+        isDragging = true;
+        isHatDragging = false;
+        
+        startX = event.offsetX - imgX;
+        startY = event.offsetY - imgY;
+    }
+});
+
+function isMouseOnHat(mouseX, mouseY) {
+    // Adjust mouse coordinates for potential canvas scaling
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    mouseX *= scaleX;
+    mouseY *= scaleY;
+
+    return (
+        mouseX >= hatX &&
+        mouseX <= hatX + hatWidth * hatScale &&
+        mouseY >= hatY &&
+        mouseY <= hatY + hatHeight * hatScale
+    );  
+}
+
+canvas.addEventListener("mousemove", (event) => {
+    canvas.style.cursor = isMouseOnHat(event.offsetX, event.offsetY) ? "move" : "default";
+
+    if (isDragging) {
+        let newImgX = event.offsetX - startX;
+        let newImgY = event.offsetY - startY;
+
+        newImgX = Math.max(Math.min(newImgX, 0), canvas.width - scaledWidth);
+        newImgY = Math.max(Math.min(newImgY, 0), canvas.height - scaledHeight);
+
+        imgX = newImgX;
+        imgY = newImgY;
+
+        drawCanvas();
+    }
+
+    if (isHatDragging) {
+        let newHatX = event.offsetX - hatStartX;
+        let newHatY = event.offsetY - hatStartY;
+
+        newHatX = Math.max(0, Math.min(newHatX, canvas.width - hatWidth));
+        newHatY = Math.max(0, Math.min(newHatY, canvas.height - hatHeight));
+
+        hatX = newHatX;
+        hatY = newHatY;
+        drawCanvas();
+    }
+});
+
+canvas.addEventListener("mouseup", () => {
+    isDragging = false;
+    isHatDragging = false;
+});
+
+canvas.addEventListener("mouseleave", () => {
+    isDragging = false;
+    isHatDragging = false;
+});
+
+/* Flip the hat */
+flipButton.addEventListener("click", () => {
+    flipped = !flipped;
+    drawCanvas();
+});
+
+/* Reset canvas */
+resetButton.addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    img = null;
+    hatRotation = 0;
+    hatScale = 1;
+    flipped = false;
+    uploadButton.classList.remove("hidden");
+    drawCanvas();
+});
+
+/* export button */
+exportButton.addEventListener("click", () => {
+    if (img !== null) {
+        const dataURL = canvas.toDataURL("image/png");
+
+        const link = document.createElement("a");
+        link.classList.add("hidden");
+        link.href = dataURL;
+
+        link.download = "profile-picture.png";
+
+        link.click();
+    }
+});
+
+// Add this event listener for the scale slider
+const scaleSlider = document.getElementById("scale-slider");
+scaleSlider.addEventListener("input", (event) => {
+    hatScale = parseFloat(event.target.value);
+    drawCanvas();
+});
+
+// Add this event listener for the scale slider
+const rotateSlider = document.getElementById("rotate-slider");
+rotateSlider.addEventListener("input", (event) => {
+    hatRotation = parseFloat(event.target.value);
+    drawCanvas();
+});
+
+// Replace the existing adjustUploadGuiSize function with this one
+function adjustUploadGuiSize() {
+    const uploadGui = document.getElementById('upload-gui');
+    if (!uploadGui) return;
+
+    const aspectRatio = document.documentElement.clientHeight / document.documentElement.clientWidth;
+    const isMobile = aspectRatio > 1.51 || document.documentElement.clientWidth < 840;
+
+    if (isMobile) {
+        const scaleValue = document.documentElement.clientWidth * 0.8 / 600;
+        uploadGui.style.transform = `scale(${scaleValue})`;
+        uploadGui.style.minHeight = `820px`;
+    } else {
+        const maxHeight = document.documentElement.clientHeight * 0.8;
+        if (maxHeight < 820) {
+            const scaleValue = maxHeight / 820;
+            uploadGui.style.transform = `scale(${scaleValue})`;
+            uploadGui.style.minHeight = `820px`;
+        }
+    }
+}
+  
+// Call the function on page load and window resize
+document.addEventListener('DOMContentLoaded', adjustUploadGuiSize);
+window.addEventListener('resize', adjustUploadGuiSize);
