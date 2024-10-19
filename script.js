@@ -23,6 +23,8 @@ let hatX,
 let isHatDragging = false;
 let hatStartX, hatStartY;
 let flipped = false;
+let hatScale = 1;
+let hatRotation = 0;
 
 // Set canvas size
 canvas.height = canvas.width;
@@ -83,20 +85,14 @@ function drawCanvas() {
 
         if (hatImg) {
             ctx.save();
-
+            ctx.translate(hatX + (hatWidth * hatScale) / 2, hatY + (hatHeight * hatScale) / 2);
+            ctx.rotate(hatRotation * Math.PI / 180);
+            
             if (flipped) {
-                ctx.translate(hatX + hatWidth, hatY);
                 ctx.scale(-1, 1);
-                ctx.drawImage(hatImg, 0, 0, hatWidth, hatHeight);
-                ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation
-            } else {
-                ctx.drawImage(hatImg, hatX, hatY, hatWidth, hatHeight);
             }
-
-            // Debug rectangle
-            ctx.strokeStyle = 'blue';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(hatX, hatY, hatWidth, hatHeight);
+            
+            ctx.drawImage(hatImg, -hatWidth * hatScale / 2, -hatHeight * hatScale / 2, hatWidth * hatScale, hatHeight * hatScale);
             
             ctx.restore();
         }
@@ -131,9 +127,9 @@ function isMouseOnHat(mouseX, mouseY) {
 
     return (
         mouseX >= hatX &&
-        mouseX <= hatX + hatWidth &&
+        mouseX <= hatX + hatWidth * hatScale &&
         mouseY >= hatY &&
-        mouseY <= hatY + hatHeight
+        mouseY <= hatY + hatHeight * hatScale
     );  
 }
 
@@ -186,6 +182,9 @@ flipButton.addEventListener("click", () => {
 resetButton.addEventListener("click", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     img = null;
+    hatRotation = 0;
+    hatScale = 1;
+    flipped = false;
     uploadButton.classList.remove("hidden");
     drawCanvas();
 });
@@ -204,3 +203,43 @@ exportButton.addEventListener("click", () => {
         link.click();
     }
 });
+
+// Add this event listener for the scale slider
+const scaleSlider = document.getElementById("scale-slider");
+scaleSlider.addEventListener("input", (event) => {
+    hatScale = parseFloat(event.target.value);
+    drawCanvas();
+});
+
+// Add this event listener for the scale slider
+const rotateSlider = document.getElementById("rotate-slider");
+rotateSlider.addEventListener("input", (event) => {
+    hatRotation = parseFloat(event.target.value);
+    drawCanvas();
+});
+
+// Replace the existing adjustUploadGuiSize function with this one
+function adjustUploadGuiSize() {
+    const uploadGui = document.getElementById('upload-gui');
+    if (!uploadGui) return;
+
+    const aspectRatio = document.documentElement.clientHeight / document.documentElement.clientWidth;
+    const isMobile = aspectRatio > 1.51 || document.documentElement.clientWidth < 840;
+
+    if (isMobile) {
+        const scaleValue = document.documentElement.clientWidth * 0.8 / 600;
+        uploadGui.style.transform = `scale(${scaleValue})`;
+        uploadGui.style.minHeight = `820px`;
+    } else {
+        const maxHeight = document.documentElement.clientHeight * 0.8;
+        if (maxHeight < 820) {
+            const scaleValue = maxHeight / 820;
+            uploadGui.style.transform = `scale(${scaleValue})`;
+            uploadGui.style.minHeight = `820px`;
+        }
+    }
+}
+  
+// Call the function on page load and window resize
+document.addEventListener('DOMContentLoaded', adjustUploadGuiSize);
+window.addEventListener('resize', adjustUploadGuiSize);

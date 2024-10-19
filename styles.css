@@ -21,17 +21,17 @@ body {
     height: 820px;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly; 
-    align-items: center; 
+    justify-content: space-evenly;
+    align-items: center;
     border-radius: 3%;
 }
 
 #canvas-container {
-    position: relative; 
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column; 
+    flex-direction: column;
     width: 100%;
     height: auto;
 }
@@ -42,24 +42,12 @@ canvas {
     border-radius: 1% 1% 1% 0%;
 }
 
-#upload-button {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.7);
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
 .hidden {
     display: none;
 }
 
 #logo-header {
-    width: 100%; 
+    width: 100%;
     height: 17.5%;
     display: flex;
     justify-content: center;
@@ -68,7 +56,7 @@ canvas {
 
 #logo-header img {
     width: 12%;
-    height: auto; 
+    height: auto;
 }
 
 #heading {
@@ -76,31 +64,61 @@ canvas {
 }
 
 #upload-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 4% 8%;
+    cursor: pointer;
     width: 40%;
     height: 17.5%;
     background-color: #4C8344;
     border: none;
-    border-radius: 20px; 
-    color: #074000; 
-    font-family: 'K2D', sans-serif; 
-    font-size: 250%; 
+    border-radius: 20px;
+    color: #074000;
+    font-family: 'K2D', sans-serif;
+    font-size: 250%;
     text-align: center;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
 #upload-button:hover {
-    background-color: #4c8344cc; 
+    background-color: #4c8344cc;
 }
 
 #button-container {
-    height:17.5%;
+    height: 17.5%;
     width: 90%;
     position: relative;
     display: flex;
-    justify-content: center; 
-    align-items: flex-start; 
-    margin-bottom: 10%;
+    justify-content: center;
+    align-items: flex-start;
+    margin-bottom: 8%;
+}
+
+#slider-container {
+    position: absolute;
+    bottom: -3%;
+    left: 0;
+    width: 50%;
+}
+
+.slider-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#scale-slider,
+#rotate-slider {
+    width: 70%;
+}
+
+#scale-label,
+#rotate-label {
+    color: white;
+    font-size: 150%;
 }
 
 #flip-hat {
@@ -111,8 +129,8 @@ canvas {
     padding: 10px;
 
     position: absolute;
-    top: 0; 
-    left: 0; 
+    top: 0;
+    left: 0;
 
     justify-content: center;
     align-items: center;
@@ -123,11 +141,12 @@ canvas {
 }
 
 #flip-hat:hover {
-    background-color: #24ba10d3; 
+    background-color: #24ba10d3;
 }
 
 
-#export, #reset {
+#export,
+#reset {
     height: 75%;
     border: none;
     border-radius: 40px;
@@ -138,8 +157,8 @@ canvas {
     background-color: #fff;
 
     position: absolute;
-    bottom: 0; 
-    right: 20%; 
+    bottom: 0;
+    right: 20%;
 
     display: flex;
     justify-content: flex-start;
@@ -164,9 +183,9 @@ canvas {
     font-family: 'K2D', sans-serif;
 
     position: absolute;
-    bottom: 0; 
+    bottom: 0;
     right: 0;
-    z-index: 1; 
+    z-index: 1;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
@@ -174,8 +193,6 @@ canvas {
 #export:hover {
     background-image: linear-gradient(#1ced00, #22ad0f);
 }
-
-
 
 #hat-container {
     position: absolute;
@@ -189,31 +206,4 @@ canvas {
     display: block;
     width: 100%;
     height: 100%;
-}
-
-.resize-handle {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background-color: #007bff;
-    border: 1px solid #fff;
-    border-radius: 50%;
-}
-
-#resize-nw { top: -5px; left: -5px; cursor: nw-resize; }
-#resize-ne { top: -5px; right: -5px; cursor: ne-resize; }
-#resize-sw { bottom: -5px; left: -5px; cursor: sw-resize; }
-#resize-se { bottom: -5px; right: -5px; cursor: se-resize; }
-
-#rotate-handle {
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    background-color: #007bff;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    transform: translateX(-50%);
-    cursor: grab;
 }
