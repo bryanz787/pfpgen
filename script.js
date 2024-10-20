@@ -157,8 +157,8 @@ canvas.addEventListener("mousemove", (event) => {
         let newHatX = event.offsetX - hatStartX;
         let newHatY = event.offsetY - hatStartY;
 
-        newHatX = Math.max(-hatWidth / 2, Math.min(newHatX, canvas.width - hatWidth / 2));
-        newHatY = Math.max(-hatHeight / 2, Math.min(newHatY, canvas.height - hatHeight / 2));
+        newHatX = Math.max(-hatWidth * 7 / 8, Math.min(newHatX, canvas.width - hatWidth / 8));
+        newHatY = Math.max(-hatHeight * 7 / 8, Math.min(newHatY, canvas.height - hatHeight / 8));
 
         hatX = newHatX;
         hatY = newHatY;
