@@ -103,6 +103,28 @@ function drawCanvas() {
     }
 }
 
+function isMouseOnHat(mouseX, mouseY) {
+    // Adjust mouse coordinates for potential canvas scaling
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    mouseX *= scaleX;
+    mouseY *= scaleY;
+
+    return (
+        mouseX >= hatX &&
+        mouseX <= hatX + hatWidth * hatScale &&
+        mouseY >= hatY &&
+        mouseY <= hatY + hatHeight * hatScale
+    );  
+}
+
+function stopDragging() {
+    isDragging = false;
+    isHatDragging = false;
+}
+
 /* Dragging and resizing logic */
 canvas.addEventListener("mousedown", (event) => {
     if (isMouseOnHat(event.offsetX, event.offsetY)) {
@@ -120,22 +142,29 @@ canvas.addEventListener("mousedown", (event) => {
     }
 });
 
-function isMouseOnHat(mouseX, mouseY) {
-    // Adjust mouse coordinates for potential canvas scaling
+canvas.addEventListener("touchstart", (event) => {
+    event.preventDefault();
+    const touch = event.touches[0];
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    
-    mouseX *= scaleX;
-    mouseY *= scaleY;
+    const offsetX = (touch.clientX - rect.left) * scaleX;
+    const offsetY = (touch.clientY - rect.top) * scaleY;
 
-    return (
-        mouseX >= hatX &&
-        mouseX <= hatX + hatWidth * hatScale &&
-        mouseY >= hatY &&
-        mouseY <= hatY + hatHeight * hatScale
-    );  
-}
+    if (isMouseOnHat(offsetX, offsetY)) {
+        isHatDragging = true;
+        isDragging = false;
+
+        hatStartX = offsetX - hatX;
+        hatStartY = offsetY - hatY;
+    } else if (img) {
+        isDragging = true;
+        isHatDragging = false;
+        
+        startX = offsetX - imgX;
+        startY = offsetY - imgY;
+    }
+});
 
 canvas.addEventListener("mousemove", (event) => {
     canvas.style.cursor = isMouseOnHat(event.offsetX, event.offsetY) ? "move" : "default";
@@ -157,8 +186,8 @@ canvas.addEventListener("mousemove", (event) => {
         let newHatX = event.offsetX - hatStartX;
         let newHatY = event.offsetY - hatStartY;
 
-        newHatX = Math.max(-hatWidth * 7 / 8, Math.min(newHatX, canvas.width - hatWidth / 8));
-        newHatY = Math.max(-hatHeight * 7 / 8, Math.min(newHatY, canvas.height - hatHeight / 8));
+        newHatX = Math.max(-hatWidth * hatScale, Math.min(newHatX, canvas.width));
+        newHatY = Math.max(-hatHeight * hatScale, Math.min(newHatY, canvas.height));
 
         hatX = newHatX;
         hatY = newHatY;
@@ -166,15 +195,48 @@ canvas.addEventListener("mousemove", (event) => {
     }
 });
 
-canvas.addEventListener("mouseup", () => {
-    isDragging = false;
-    isHatDragging = false;
+canvas.addEventListener("touchmove", (event) => {
+    event.preventDefault();
+    const touch = event.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const offsetX = (touch.clientX - rect.left) * scaleX;
+    const offsetY = (touch.clientY - rect.top) * scaleY;
+
+    if (isDragging) {
+        let newImgX = offsetX - startX;
+        let newImgY = offsetY - startY;
+
+        newImgX = Math.max(Math.min(newImgX, 0), canvas.width - scaledWidth);
+        newImgY = Math.max(Math.min(newImgY, 0), canvas.height - scaledHeight);
+
+        imgX = newImgX;
+        imgY = newImgY;
+
+        drawCanvas();
+    }
+
+    if (isHatDragging) {
+        let newHatX = offsetX - hatStartX;
+        let newHatY = offsetY - hatStartY;
+
+        newHatX = Math.max(-hatWidth * hatScale, Math.min(newHatX, canvas.width));
+        newHatY = Math.max(-hatHeight * hatScale, Math.min(newHatY, canvas.height));
+
+        hatX = newHatX;
+        hatY = newHatY;
+        drawCanvas();
+    }
 });
 
-canvas.addEventListener("mouseleave", () => {
-    isDragging = false;
-    isHatDragging = false;
-});
+canvas.addEventListener("mouseup", stopDragging);
+
+canvas.addEventListener("touchend", stopDragging);
+
+canvas.addEventListener("mouseleave", stopDragging);
+
+canvas.addEventListener("touchcancel", stopDragging);
 
 /* Flip the hat */
 flipButton.addEventListener("click", () => {
@@ -186,9 +248,15 @@ flipButton.addEventListener("click", () => {
 resetButton.addEventListener("click", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     img = null;
+
     hatRotation = 0;
     hatScale = 1;
     flipped = false;
+    hatWidth = 200;
+    hatHeight = (hatImg.height * hatWidth) / hatImg.width;
+    hatX = canvas.width / 2 - hatWidth / 2;
+    hatY = canvas.height / 2 - hatHeight / 2;
+
     uploadButton.classList.remove("hidden");
     drawCanvas();
 });
