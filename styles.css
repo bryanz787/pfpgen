@@ -97,30 +97,6 @@ canvas {
     margin-bottom: 8%;
 }
 
-#slider-container {
-    position: absolute;
-    bottom: -3%;
-    left: 0;
-    width: 50%;
-}
-
-.slider-group {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-#scale-slider,
-#rotate-slider {
-    width: 70%;
-}
-
-#scale-label,
-#rotate-label {
-    color: white;
-    font-size: 150%;
-}
-
 #flip-hat {
     background-color: #25BA10;
     border: none;
@@ -143,7 +119,6 @@ canvas {
 #flip-hat:hover {
     background-color: #24ba10d3;
 }
-
 
 #export,
 #reset {
@@ -207,3 +182,52 @@ canvas {
     width: 100%;
     height: 100%;
 }
+
+/* Slider styling bs */
+#slider-container {
+    position: absolute;
+    bottom: -3%;
+    left: 0;
+    width: 50%;
+}
+
+.slider-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#scale-slider,
+#rotate-slider {
+    width: 70%;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #074000;
+    border-radius: 10px;
+    height: 10px;
+}
+
+#scale-slider::-webkit-slider-thumb,
+#rotate-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background-color: #4BCF3A;
+    border-radius: 50%;
+}
+
+#scale-slider::-moz-range-thumb,
+#rotate-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #4BCF3A;
+    border-radius: 50%;
+}
+
+#scale-label,
+#rotate-label {
+    color: white;
+    font-size: 150%;
+}
+

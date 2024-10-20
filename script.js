@@ -5,7 +5,8 @@ const fileInput = document.getElementById("file-input");
 const flipButton = document.getElementById("flip-hat");
 const resetButton = document.getElementById("reset");
 const exportButton = document.getElementById("export");
-
+const scaleSlider = document.getElementById("scale-slider");
+const rotateSlider = document.getElementById("rotate-slider");
 let img = null;
 let imgX = 0,
     imgY = 0;
@@ -37,6 +38,9 @@ hatImg.onload = () => {
     hatX = canvas.width / 2 - hatWidth / 2;
     hatY = canvas.height / 2 - hatHeight / 2;
 };
+
+changeSliderColor(scaleSlider);
+changeSliderColor(rotateSlider);
 
 /* Upload image logic */
 uploadButton.addEventListener("click", () => {
@@ -153,8 +157,8 @@ canvas.addEventListener("mousemove", (event) => {
         let newHatX = event.offsetX - hatStartX;
         let newHatY = event.offsetY - hatStartY;
 
-        newHatX = Math.max(0, Math.min(newHatX, canvas.width - hatWidth));
-        newHatY = Math.max(0, Math.min(newHatY, canvas.height - hatHeight));
+        newHatX = Math.max(-hatWidth / 2, Math.min(newHatX, canvas.width - hatWidth / 2));
+        newHatY = Math.max(-hatHeight / 2, Math.min(newHatY, canvas.height - hatHeight / 2));
 
         hatX = newHatX;
         hatY = newHatY;
@@ -205,16 +209,16 @@ exportButton.addEventListener("click", () => {
 });
 
 // Add this event listener for the scale slider
-const scaleSlider = document.getElementById("scale-slider");
 scaleSlider.addEventListener("input", (event) => {
     hatScale = parseFloat(event.target.value);
+    changeSliderColor(scaleSlider);
     drawCanvas();
 });
 
 // Add this event listener for the scale slider
-const rotateSlider = document.getElementById("rotate-slider");
 rotateSlider.addEventListener("input", (event) => {
     hatRotation = parseFloat(event.target.value);
+    changeSliderColor(rotateSlider);
     drawCanvas();
 });
 
@@ -243,3 +247,8 @@ function adjustUploadGuiSize() {
 // Call the function on page load and window resize
 document.addEventListener('DOMContentLoaded', adjustUploadGuiSize);
 window.addEventListener('resize', adjustUploadGuiSize);
+
+function changeSliderColor(slider) {
+    const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+    slider.style.background = `linear-gradient(to right, #4BCF3A 0%, #4BCF3A ${value}%, #074000 ${value}%, #074000 100%)`;
+}
