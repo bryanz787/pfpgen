@@ -184,11 +184,67 @@ canvas {
 }
 
 /* Slider styling bs */
-#slider-container {
+#slider-container-mobile {
+    width: calc(600px - 8%);
+    margin-top: 4%;
+    background-color: #0E4407;
+    padding: 3% 3% 3% 5%;
+    border-radius: 20px;
+
+    #rotate-slider-container {
+        margin-bottom: 3%;
+    }  
+
+    #scale-slider, #rotate-slider {
+        height: 20px;
+    }
+
+    #scale-slider::-webkit-slider-thumb,
+    #rotate-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: #4BCF3A;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+    }
+
+    #scale-slider::-moz-range-thumb,
+    #rotate-slider::-moz-range-thumb {
+        background-color: #4BCF3A;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+    }
+}
+
+#slider-container-desktop {
     position: absolute;
     bottom: -3%;
     left: 0;
     width: 50%;
+
+    #scale-slider, #rotate-slider {
+        height: 10px;
+    }
+
+    #scale-slider::-webkit-slider-thumb,
+    #rotate-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: #4BCF3A;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+    }
+
+    #scale-slider::-moz-range-thumb,
+    #rotate-slider::-moz-range-thumb {
+        background-color: #4BCF3A;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+    }
 }
 
 .slider-group {
@@ -202,32 +258,12 @@ canvas {
     width: 70%;
     -webkit-appearance: none;
     appearance: none;
-    background-color: #074000;
+    background-color: #052700;
     border-radius: 10px;
-    height: 10px;
-}
-
-#scale-slider::-webkit-slider-thumb,
-#rotate-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background-color: #4BCF3A;
-    border-radius: 50%;
-}
-
-#scale-slider::-moz-range-thumb,
-#rotate-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background-color: #4BCF3A;
-    border-radius: 50%;
 }
 
 #scale-label,
 #rotate-label {
-    color: white;
     font-size: 150%;
+    color: white;
 }
-

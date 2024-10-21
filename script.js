@@ -5,8 +5,12 @@ const fileInput = document.getElementById("file-input");
 const flipButton = document.getElementById("flip-hat");
 const resetButton = document.getElementById("reset");
 const exportButton = document.getElementById("export");
-const scaleSlider = document.getElementById("scale-slider");
-const rotateSlider = document.getElementById("rotate-slider");
+const scaleSliders = document.querySelectorAll("#scale-slider");
+const rotateSliders = document.querySelectorAll("#rotate-slider");
+const sliderContainerDesktop = document.getElementById("slider-container-desktop");
+const sliderContainerMobile = document.getElementById("slider-container-mobile");
+const guiContainer = document.getElementById("gui-container");
+
 let img = null;
 let imgX = 0,
     imgY = 0;
@@ -39,8 +43,12 @@ hatImg.onload = () => {
     hatY = canvas.height / 2 - hatHeight / 2;
 };
 
-changeSliderColor(scaleSlider);
-changeSliderColor(rotateSlider);
+scaleSliders.forEach(slider => { 
+    changeSliderColor(slider);
+});
+rotateSliders.forEach(slider => {
+    changeSliderColor(slider);
+});
 
 /* Upload image logic */
 uploadButton.addEventListener("click", () => {
@@ -277,17 +285,21 @@ exportButton.addEventListener("click", () => {
 });
 
 // Add this event listener for the scale slider
-scaleSlider.addEventListener("input", (event) => {
-    hatScale = parseFloat(event.target.value);
-    changeSliderColor(scaleSlider);
-    drawCanvas();
+scaleSliders.forEach(slider => {
+    slider.addEventListener("input", (event) => {
+        hatScale = parseFloat(event.target.value);
+        changeSliderColor(slider);
+        drawCanvas();
+    });
 });
 
 // Add this event listener for the scale slider
-rotateSlider.addEventListener("input", (event) => {
-    hatRotation = parseFloat(event.target.value);
-    changeSliderColor(rotateSlider);
-    drawCanvas();
+rotateSliders.forEach(slider => {
+    slider.addEventListener("input", (event) => {
+        hatRotation = parseFloat(event.target.value);
+        changeSliderColor(slider);
+        drawCanvas();
+    });
 });
 
 // Replace the existing adjustUploadGuiSize function with this one
@@ -296,13 +308,19 @@ function adjustUploadGuiSize() {
     if (!uploadGui) return;
 
     const aspectRatio = document.documentElement.clientHeight / document.documentElement.clientWidth;
-    const isMobile = aspectRatio > 1.51 || document.documentElement.clientWidth < 840;
+    const isMobile = aspectRatio > 1.51 || document.documentElement.clientWidth < 768;
 
     if (isMobile) {
+        sliderContainerDesktop.classList.add("hidden");
+        sliderContainerMobile.classList.remove("hidden");
+
         const scaleValue = document.documentElement.clientWidth * 0.8 / 600;
-        uploadGui.style.transform = `scale(${scaleValue})`;
-        uploadGui.style.minHeight = `820px`;
+        guiContainer.style.transform = `scale(${scaleValue})`;
+        uploadGui.style.minHeight = `820px`;     
     } else {
+        sliderContainerDesktop.classList.remove("hidden");
+        sliderContainerMobile.classList.add("hidden");
+
         const maxHeight = document.documentElement.clientHeight * 0.8;
         if (maxHeight < 820) {
             const scaleValue = maxHeight / 820;
@@ -318,5 +336,5 @@ window.addEventListener('resize', adjustUploadGuiSize);
 
 function changeSliderColor(slider) {
     const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
-    slider.style.background = `linear-gradient(to right, #4BCF3A 0%, #4BCF3A ${value}%, #074000 ${value}%, #074000 100%)`;
+    slider.style.background = `linear-gradient(to right, #4BCF3A 0%, #4BCF3A ${value}%, #052700 ${value}%, #052700 100%)`;
 }
