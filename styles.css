@@ -193,9 +193,10 @@ canvas {
 
     #rotate-slider-container {
         margin-bottom: 3%;
-    }  
+    }
 
-    #scale-slider, #rotate-slider {
+    #scale-slider,
+    #rotate-slider {
         height: 20px;
     }
 
@@ -224,7 +225,8 @@ canvas {
     left: 0;
     width: 50%;
 
-    #scale-slider, #rotate-slider {
+    #scale-slider,
+    #rotate-slider {
         height: 10px;
     }
 
@@ -266,4 +268,11 @@ canvas {
 #rotate-label {
     font-size: 150%;
     color: white;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    color: white;
+    font-size: 1rem;
 }

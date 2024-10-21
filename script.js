@@ -10,6 +10,7 @@ const rotateSliders = document.querySelectorAll("#rotate-slider");
 const sliderContainerDesktop = document.getElementById("slider-container-desktop");
 const sliderContainerMobile = document.getElementById("slider-container-mobile");
 const guiContainer = document.getElementById("gui-container");
+const footer = document.getElementById("footer");
 
 let img = null;
 let imgX = 0,
@@ -43,7 +44,7 @@ hatImg.onload = () => {
     hatY = canvas.height / 2 - hatHeight / 2;
 };
 
-scaleSliders.forEach(slider => { 
+scaleSliders.forEach(slider => {
     changeSliderColor(slider);
 });
 rotateSliders.forEach(slider => {
@@ -99,13 +100,13 @@ function drawCanvas() {
             ctx.save();
             ctx.translate(hatX + (hatWidth * hatScale) / 2, hatY + (hatHeight * hatScale) / 2);
             ctx.rotate(hatRotation * Math.PI / 180);
-            
+
             if (flipped) {
                 ctx.scale(-1, 1);
             }
-            
+
             ctx.drawImage(hatImg, -hatWidth * hatScale / 2, -hatHeight * hatScale / 2, hatWidth * hatScale, hatHeight * hatScale);
-            
+
             ctx.restore();
         }
     }
@@ -116,7 +117,7 @@ function isMouseOnHat(mouseX, mouseY) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    
+
     mouseX *= scaleX;
     mouseY *= scaleY;
 
@@ -125,7 +126,7 @@ function isMouseOnHat(mouseX, mouseY) {
         mouseX <= hatX + hatWidth * hatScale &&
         mouseY >= hatY &&
         mouseY <= hatY + hatHeight * hatScale
-    );  
+    );
 }
 
 function stopDragging() {
@@ -144,7 +145,7 @@ canvas.addEventListener("mousedown", (event) => {
     } else if (img) {
         isDragging = true;
         isHatDragging = false;
-        
+
         startX = event.offsetX - imgX;
         startY = event.offsetY - imgY;
     }
@@ -168,7 +169,7 @@ canvas.addEventListener("touchstart", (event) => {
     } else if (img) {
         isDragging = true;
         isHatDragging = false;
-        
+
         startX = offsetX - imgX;
         startY = offsetY - imgY;
     }
@@ -311,13 +312,15 @@ function adjustUploadGuiSize() {
     const isMobile = aspectRatio > 1.51 || document.documentElement.clientWidth < 768;
 
     if (isMobile) {
+        footer.style.fontSize = "0.5rem";
         sliderContainerDesktop.classList.add("hidden");
         sliderContainerMobile.classList.remove("hidden");
 
         const scaleValue = document.documentElement.clientWidth * 0.8 / 600;
         guiContainer.style.transform = `scale(${scaleValue})`;
-        uploadGui.style.minHeight = `820px`;     
+        uploadGui.style.minHeight = `820px`;
     } else {
+        footer.style.fontSize = "1rem";
         sliderContainerDesktop.classList.remove("hidden");
         sliderContainerMobile.classList.add("hidden");
 
@@ -329,7 +332,7 @@ function adjustUploadGuiSize() {
         }
     }
 }
-  
+
 // Call the function on page load and window resize
 document.addEventListener('DOMContentLoaded', adjustUploadGuiSize);
 window.addEventListener('resize', adjustUploadGuiSize);
