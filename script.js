@@ -273,14 +273,34 @@ resetButton.addEventListener("click", () => {
 /* export button */
 exportButton.addEventListener("click", () => {
     if (img !== null) {
-        const dataURL = canvas.toDataURL("image/png");
+        // Create a temporary canvas with 1500x1500 resolution
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 1500;
+        tempCanvas.height = 1500;
+        const tempCtx = tempCanvas.getContext('2d');
 
+        // Calculate the scale factor
+        const scaleFactor = 1500 / canvas.width;
+
+        // Draw the background image
+        tempCtx.drawImage(img, imgX * scaleFactor, imgY * scaleFactor, scaledWidth * scaleFactor, scaledHeight * scaleFactor);
+
+        // Draw the hat
+        tempCtx.save();
+        tempCtx.translate(hatX * scaleFactor + (hatWidth * hatScale * scaleFactor) / 2, hatY * scaleFactor + (hatHeight * hatScale * scaleFactor) / 2);
+        tempCtx.rotate(hatRotation * Math.PI / 180);
+        tempCtx.scale(flipped ? -1 : 1, 1);
+        tempCtx.drawImage(hatImg, -(hatWidth * hatScale * scaleFactor) / 2, -(hatHeight * hatScale * scaleFactor) / 2, hatWidth * hatScale * scaleFactor, hatHeight * hatScale * scaleFactor);
+        tempCtx.restore();
+
+        // Get the data URL from the temporary canvas
+        const dataURL = tempCanvas.toDataURL("image/png");
+
+        // Create and click a download link
         const link = document.createElement("a");
         link.classList.add("hidden");
         link.href = dataURL;
-
         link.download = "profile-picture.png";
-
         link.click();
     }
 });
