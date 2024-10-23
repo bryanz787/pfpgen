@@ -332,7 +332,6 @@ function adjustUploadGuiSize() {
     const isMobile = aspectRatio > 1.51 || document.documentElement.clientWidth < 768;
 
     if (isMobile) {
-        footer.style.fontSize = "0.5rem";
         sliderContainerDesktop.classList.add("hidden");
         sliderContainerMobile.classList.remove("hidden");
 
@@ -340,7 +339,6 @@ function adjustUploadGuiSize() {
         guiContainer.style.transform = `scale(${scaleValue})`;
         uploadGui.style.minHeight = `820px`;
     } else {
-        footer.style.fontSize = "1rem";
         sliderContainerDesktop.classList.remove("hidden");
         sliderContainerMobile.classList.add("hidden");
 
