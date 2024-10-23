@@ -46,5 +46,4 @@ jspm_packages/
 # Temporary files
 tmp
 # Vercel folder
-.vercel/
-.vercel/project.json
+.vercel
